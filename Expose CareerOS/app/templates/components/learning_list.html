@@ -1,0 +1,17 @@
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="learning-cards-grid">
+    {% for topic in topics %}
+        <div id="learning-card-{{ topic.id }}">
+            {% include 'components/learning_card.html' %}
+        </div>
+    {% else %}
+        <div class="md:col-span-2 flex flex-col items-center justify-center py-20 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 text-center text-slate-450">
+            <div class="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-950 flex items-center justify-center mb-4 text-slate-350 dark:text-slate-700">
+                <i data-lucide="book-open" class="w-8 h-8 stroke-[1.5]"></i>
+            </div>
+            <h4 class="text-base font-extrabold text-slate-800 dark:text-white">No learning topics found</h4>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-sm">
+                Log a new subject of research or update categories/priorities options.
+            </p>
+        </div>
+    {% endfor %}
+</div>

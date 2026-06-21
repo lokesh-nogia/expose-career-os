@@ -1,0 +1,5 @@
+{% include 'components/learning_list.html' %}
+
+<!-- Out-Of-Band updates for learning stats widgets -->
+<div id="stats-learning-total" hx-swap-oob="true" class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ stats.total }}</div>
+<div id="stats-learning-completed" hx-swap-oob="true" class="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">{{ stats.completed }}</div>

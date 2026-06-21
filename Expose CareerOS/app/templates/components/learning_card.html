@@ -1,0 +1,93 @@
+<div id="learning-card-{{ topic.id }}" 
+     class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all h-full flex flex-col justify-between relative overflow-hidden group">
+    
+    <!-- Complete Status Background Glow -->
+    {% if topic.is_completed %}
+        <div class="absolute inset-0 bg-emerald-500/[0.02] dark:bg-emerald-400/[0.01] pointer-events-none"></div>
+    {% endif %}
+
+    <div>
+        <!-- Topic Header: Priority & Category -->
+        <div class="flex items-center justify-between gap-3 mb-3.5">
+            <span class="text-xs px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-650 dark:text-slate-350 rounded-lg font-bold">
+                {{ topic.category }}
+            </span>
+            
+            <!-- Priority Badge -->
+            <span class="text-xs font-bold uppercase tracking-wider
+                {% if topic.priority == 'High' %} text-rose-500
+                {% elif topic.priority == 'Medium' %} text-amber-500
+                {% else %} text-blue-500
+                {% endif %}">
+                ● {{ topic.priority }} Priority
+            </span>
+        </div>
+
+        <!-- Topic Name -->
+        <h4 class="font-extrabold text-slate-850 dark:text-white text-base leading-snug mb-2 
+            {% if topic.is_completed %} line-through text-slate-400 dark:text-slate-500 {% endif %}">
+            {{ topic.topic }}
+        </h4>
+
+        <!-- Notes -->
+        <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed font-medium">
+            {{ topic.notes or "No notes logged for this subject." }}
+        </p>
+    </div>
+
+    <!-- Actions / Progress controls -->
+    <div class="border-t border-slate-100 dark:border-slate-800/60 pt-4 mt-2">
+        <!-- Progress Slider -->
+        <div class="space-y-2.5">
+            <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-400 font-semibold uppercase tracking-wide">Progress</span>
+                <span class="font-extrabold text-brand-600 dark:text-brand-400 text-sm tracking-tight transition-all">
+                    {{ topic.progress_percentage }}%
+                </span>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <input type="range" name="progress_percentage" min="0" max="100" 
+                       value="{{ topic.progress_percentage }}"
+                       hx-post="/learning/{{ topic.id }}/progress"
+                       hx-trigger="change"
+                       hx-target="#learning-card-{{ topic.id }}"
+                       hx-swap="outerHTML"
+                       oninput="this.parentElement.previousElementSibling.lastElementChild.innerText = this.value + '%'"
+                       class="flex-1 accent-brand-500 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg cursor-pointer transition-all">
+                
+                <!-- Quick checkmark button to mark complete -->
+                {% if not topic.is_completed %}
+                    <button hx-post="/learning/{{ topic.id }}/complete"
+                            hx-target="#learning-card-{{ topic.id }}"
+                            hx-swap="outerHTML"
+                            class="p-1.5 bg-slate-50 hover:bg-emerald-50 dark:bg-slate-950 dark:hover:bg-emerald-950/20 text-slate-400 hover:text-emerald-600 rounded-lg border border-slate-200 dark:border-slate-800 transition-colors"
+                            title="Mark Completed">
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    </button>
+                {% else %}
+                    <span class="p-1.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-455 rounded-lg border border-emerald-100 dark:border-emerald-900/30"
+                          title="Completed">
+                        <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+                    </span>
+                {% endif %}
+
+                <!-- Delete button -->
+                <button hx-delete="/learning/{{ topic.id }}"
+                        hx-target="#learning-card-{{ topic.id }}"
+                        hx-swap="delete"
+                        hx-confirm="Are you sure you want to delete this topic?"
+                        class="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-slate-400 hover:text-rose-600 rounded-lg transition-colors opacity-100 sm:opacity-0 group-hover:opacity-100 duration-200"
+                        title="Delete Topic">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- OOB stats widgets updates -->
+{% if oob_stats %}
+<div id="stats-learning-total" hx-swap-oob="true" class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ stats.total }}</div>
+<div id="stats-learning-completed" hx-swap-oob="true" class="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">{{ stats.completed }}</div>
+{% endif %}

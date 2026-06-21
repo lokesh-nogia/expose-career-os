@@ -1,0 +1,11 @@
+title,company,location,source,salary,description,skills,posted_date
+Senior Java Developer,Sequretek,"Mumbai, India",LinkedIn,14.5,"Building enterprise cybersecurity microservices with Java 17, Spring Boot, and MongoDB. Requires Multithreading and Docker knowledge.","Java,Spring Boot,MongoDB,Multithreading,Docker",2026-06-10
+Java Backend Engineer,Stripe,Remote,Stripe Careers,22.0,"Work on core payment gateways, API integrations, and low-latency database queries.","Java,Spring Boot,AWS,Kafka,PostgreSQL",2026-06-08
+SDE II - Backend Developer,Amazon,"Bangalore, India",Amazon Jobs,25.0,"Build cloud services at scale. Requires solid System Design, Java concurrency, Docker, and AWS deployments.","Java,System Design,Docker,AWS,Git",2026-06-09
+Spring Boot Developer,Infosys,"Mumbai, India",Naukri,9.0,"Responsible for microservices modules creation, REST APIs, and MySQL operations.","Java,Spring Boot,MySQL,REST APIs",2026-06-05
+Lead Java Developer,J.P. Morgan,"Mumbai, India",Glassdoor,28.0,"Lead team building low latency trading architectures. Requires expert Multithreading, Spring Boot, AWS, Kafka, and SQL tuning.","Java,Spring Boot,Multithreading,Kafka,AWS,System Design",2026-06-07
+Backend Engineer,Razorpay,Remote,LinkedIn,16.0,"Design billing structures. Skills: Spring Boot, REST APIs, PostgreSQL, Docker.","Spring Boot,REST APIs,PostgreSQL,Docker",2026-06-06
+Cybersecurity Backend Engineer,Quick Heal,"Pune, India",Indeed,13.0,"Log indexing pipelines. Skills: Java, OpenSearch, Kafka, Linux.","Java,OpenSearch,Kafka,Git",2026-06-04
+Senior Backend SDE,PhonePe,"Bangalore, India",LinkedIn,20.0,"Scale transactional engines. Required skills: Java, Spring Boot, PostgreSQL, Kafka, Redis.","Java,Spring Boot,PostgreSQL,Kafka",2026-06-09
+Backend Software Engineer,Microsoft,"Hyderabad, India",Microsoft Careers,24.0,"Build enterprise productivity platforms. Requires Java, Spring Boot, Docker, and Azure deployments.","Java,Spring Boot,Docker,Azure,Git",2026-06-10
+SDE III (Core Payments),Stripe,"Bangalore, India",Stripe Careers,30.0,"Lead execution of scale pipelines. Required: Java, Microservices, AWS, Kafka, System Design.","Java,Microservices,AWS,Kafka,System Design",2026-06-08

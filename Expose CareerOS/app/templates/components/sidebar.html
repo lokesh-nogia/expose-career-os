@@ -1,0 +1,65 @@
+<aside id="sidebar-nav" class="w-64 bg-slate-900 text-slate-100 min-h-screen flex flex-col fixed md:sticky top-0 left-0 z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out border-r border-slate-800 shadow-xl">
+    <!-- Sidebar Header (Brand & Logo) -->
+    <div class="h-16 flex items-center justify-between px-6 border-b border-slate-800">
+        <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white shadow-md">
+                <i data-lucide="terminal" class="w-5 h-5"></i>
+            </div>
+            <span class="font-bold text-lg tracking-wider bg-gradient-to-r from-brand-400 to-indigo-400 bg-clip-text text-transparent">EXPOSE AUTOSPY</span>
+        </div>
+        <button class="md:hidden text-slate-400 hover:text-white" onclick="toggleSidebar()">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="flex-1 px-4 py-6 space-y-2">
+        <a href="/" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group {% if active_page == 'dashboard' %} bg-brand-600 text-white font-medium shadow-lg shadow-brand-900/30 {% else %} text-slate-400 hover:bg-slate-800/60 hover:text-slate-100 {% endif %}">
+            <i data-lucide="layout-dashboard" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="/profile" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group {% if active_page == 'profile' %} bg-brand-600 text-white font-medium shadow-lg shadow-brand-900/30 {% else %} text-slate-400 hover:bg-slate-800/60 hover:text-slate-100 {% endif %}">
+            <i data-lucide="user" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+            <span>My Profile</span>
+        </a>
+
+        <a href="/jobs" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group {% if active_page == 'jobs' %} bg-brand-600 text-white font-medium shadow-lg shadow-brand-900/30 {% else %} text-slate-400 hover:bg-slate-800/60 hover:text-slate-100 {% endif %}">
+            <i data-lucide="briefcase" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+            <span>Job Tracker</span>
+        </a>
+
+        <a href="/learning" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group {% if active_page == 'learning' %} bg-brand-600 text-white font-medium shadow-lg shadow-brand-900/30 {% else %} text-slate-400 hover:bg-slate-800/60 hover:text-slate-100 {% endif %}">
+            <i data-lucide="graduation-cap" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+            <span>Learning Path</span>
+        </a>
+
+        <a href="/interviews" class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group {% if active_page == 'interviews' %} bg-brand-600 text-white font-medium shadow-lg shadow-brand-900/30 {% else %} text-slate-400 hover:bg-slate-800/60 hover:text-slate-100 {% endif %}">
+            <i data-lucide="help-circle" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+            <span>Interview Prep</span>
+        </a>
+    </nav>
+
+    <!-- Sidebar Footer (Theme Switch & App Version) -->
+    <div class="p-4 border-t border-slate-800 space-y-4">
+        <!-- Theme Toggle -->
+        <button onclick="toggleTheme()" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-950/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800/40 transition-all duration-200">
+            <div class="flex items-center space-x-2.5">
+                <i data-lucide="sun" class="w-4 h-4 dark:hidden"></i>
+                <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
+                <span class="text-sm">Theme Mode</span>
+            </div>
+            <span class="text-xs uppercase font-semibold text-slate-500 tracking-wider">
+                <span class="dark:hidden">Light</span>
+                <span class="hidden dark:inline">Dark</span>
+            </span>
+        </button>
+
+        <div class="flex items-center justify-between px-2 text-xs text-slate-600">
+            <span>Career OS v1.0.0</span>
+            <span class="flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Offline
+            </span>
+        </div>
+    </div>
+</aside>

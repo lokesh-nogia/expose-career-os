@@ -1,0 +1,42 @@
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xl w-full max-w-3xl animate-in fade-in zoom-in-95 duration-200 overflow-y-auto max-h-[85vh]">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-6">
+        <div>
+            <h3 class="text-lg font-black text-slate-850 dark:text-white flex items-center gap-2">
+                <i data-lucide="help-circle" class="w-5 h-5 text-brand-650 dark:text-brand-400"></i>
+                Adaptive Prep Assessment ({{ quiz_type|upper }})
+            </h3>
+            <p class="text-xs text-slate-450 mt-0.5">Questions chosen based on active target role gaps and weakest categories.</p>
+        </div>
+        <button onclick="closeQuizModal()" class="text-slate-450 hover:text-slate-700 dark:hover:text-slate-200">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+    </div>
+
+    <div class="space-y-6">
+        {% for q in questions %}
+            <div class="p-5 border border-slate-200 dark:border-slate-850 bg-slate-50/50 dark:bg-slate-950/40 rounded-2xl relative" id="quiz-question-{{ q.id }}">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-[9px] font-black uppercase text-indigo-500 tracking-wider bg-indigo-50 dark:bg-indigo-950/30 px-2 py-0.5 rounded-md">
+                        {{ q.category }}
+                    </span>
+                    <span class="text-[9px] text-slate-400 font-bold uppercase">{{ q.difficulty }}</span>
+                </div>
+                
+                <h4 class="font-extrabold text-sm text-slate-850 dark:text-slate-100 mb-3.5">{{ q.question }}</h4>
+                
+                <form hx-post="/interviews/quiz/submit" hx-target="#quiz-form-container-{{ q.id }}" hx-swap="outerHTML">
+                    <input type="hidden" name="question_id" value="{{ q.id }}">
+                    <div id="quiz-form-container-{{ q.id }}">
+                        <textarea name="personal_answer" required placeholder="Formulate your detailed engineering response..." 
+                                  class="w-full h-24 p-3 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 font-semibold text-xs rounded-xl focus:outline-none focus:border-brand-500 resize-none leading-normal"></textarea>
+                        <button type="submit" class="mt-2.5 px-4.5 py-2 bg-brand-650 hover:bg-brand-600 text-white rounded-xl font-bold text-xs shadow-sm">
+                            Submit Response
+                        </button>
+                    </div>
+                </form>
+            </div>
+        {% else %}
+            <p class="text-xs text-slate-400 italic text-center py-8">No questions found matching your category profile parameters.</p>
+        {% endfor %}
+    </div>
+</div>

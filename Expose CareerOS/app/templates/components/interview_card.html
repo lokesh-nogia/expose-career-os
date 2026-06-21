@@ -1,0 +1,98 @@
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+    <!-- Difficulty strip indicator -->
+    <div class="absolute left-0 top-0 bottom-0 w-1.5 
+        {% if question.difficulty == 'Easy' %} bg-emerald-500
+        {% elif question.difficulty == 'Medium' %} bg-amber-500
+        {% else %} bg-rose-500
+        {% endif %}">
+    </div>
+
+    <div class="pl-3 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+        <!-- Question content -->
+        <div class="flex-1 min-w-0">
+            <!-- Header metadata tags -->
+            <div class="flex flex-wrap items-center gap-2 mb-2 text-xs font-semibold">
+                <span class="text-brand-655 dark:text-brand-400 font-bold bg-brand-50 dark:bg-brand-900/20 px-2.5 py-1 rounded-lg">
+                    {{ question.company }}
+                </span>
+                <span class="text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
+                    {{ question.category }}
+                </span>
+                <span class="font-bold uppercase tracking-wider
+                    {% if question.difficulty == 'Easy' %} text-emerald-600 dark:text-emerald-400
+                    {% elif question.difficulty == 'Medium' %} text-amber-500
+                    {% else %} text-rose-600 dark:text-rose-400
+                    {% endif %}">
+                    {{ question.difficulty }}
+                </span>
+            </div>
+
+            <!-- The Question -->
+            <p class="font-extrabold text-slate-850 dark:text-white text-base leading-snug">
+                {{ question.question }}
+            </p>
+
+            <!-- Collapsible details for personal answer and feedback -->
+            <details class="group/details mt-4 border-t border-slate-100 dark:border-slate-800/80 pt-3 cursor-pointer">
+                <summary class="flex justify-between items-center text-xs font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider outline-none select-none list-none [&::-webkit-details-marker]:hidden">
+                    <span class="flex items-center gap-1.5">
+                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                        View Draft Response & Notes
+                    </span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 group-open/details:rotate-180 transition-transform"></i>
+                </summary>
+                
+                <div class="mt-3.5 text-xs text-slate-650 dark:text-slate-350 bg-slate-50/60 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-850 p-4 rounded-xl space-y-4">
+                    <!-- Personal Answer -->
+                    <div>
+                        <h5 class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Your Personal Answer</h5>
+                        <p class="leading-relaxed whitespace-pre-wrap font-medium text-slate-700 dark:text-slate-300">
+                            {{ question.personal_answer or "No personal response drafted yet. Click edit to add your response." }}
+                        </p>
+                    </div>
+                    
+                    <!-- Feedback -->
+                    {% if question.feedback %}
+                    <div class="border-t border-slate-150/40 dark:border-slate-800/40 pt-3">
+                        <h5 class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Assessor Feedback</h5>
+                        <p class="leading-relaxed italic font-medium text-slate-600 dark:text-slate-400">
+                            "{{ question.feedback }}"
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </details>
+        </div>
+
+        <!-- Right Side: Score & Action button -->
+        <div class="flex md:flex-col items-center md:items-end justify-between md:justify-start gap-4 shrink-0">
+            <!-- Score Rating -->
+            <div class="text-right">
+                <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Confidence Score</span>
+                <div class="flex items-center space-x-1.5 bg-slate-50 dark:bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-100 dark:border-slate-850">
+                    <i data-lucide="star" class="w-4 h-4 text-amber-500 fill-amber-500"></i>
+                    <span class="font-extrabold text-sm text-slate-800 dark:text-white">{{ question.score or 0 }}/10</span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center space-x-2 md:mt-3 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <button hx-get="/interviews/{{ question.id }}/edit" 
+                        hx-target="#interview-wrapper-{{ question.id }}" 
+                        hx-swap="innerHTML"
+                        class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-450 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg transition-colors"
+                        title="Edit Question">
+                    <i data-lucide="edit-2" class="w-4 h-4"></i>
+                </button>
+                <button hx-delete="/interviews/{{ question.id }}" 
+                        hx-target="#interview-wrapper-{{ question.id }}" 
+                        hx-swap="delete" 
+                        hx-confirm="Are you sure you want to delete this question?"
+                        class="p-2 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-slate-450 hover:text-rose-600 rounded-lg transition-colors"
+                        title="Delete Question">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

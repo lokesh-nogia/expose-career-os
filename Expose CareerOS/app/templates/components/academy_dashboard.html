@@ -1,0 +1,58 @@
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Category Mastery stats (10 categories) -->
+    <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+        <h3 class="font-extrabold text-base text-slate-850 dark:text-white mb-4 flex items-center gap-2">
+            <i data-lucide="award" class="w-5 h-5 text-brand-500"></i>
+            Academy Categories Readiness
+        </h3>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-semibold">
+            {% for item in stats %}
+                <div class="p-3 bg-slate-50 dark:bg-slate-950/40 rounded-2xl border border-slate-150 dark:border-slate-850 flex flex-col justify-between gap-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-800 dark:text-slate-200 font-extrabold">{{ item.category }}</span>
+                        <span class="text-[10px] text-brand-650 dark:text-brand-400 font-black">{{ item.readiness_pct }}%</span>
+                    </div>
+                    <div class="h-2 bg-slate-200 dark:bg-slate-850 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-brand-500 to-indigo-500" style="width: {{ item.readiness_pct }}%"></div>
+                    </div>
+                    <div class="flex justify-between text-[9px] text-slate-400 font-bold">
+                        <span>Solved: {{ item.solved_count }} / {{ item.bank_count }}</span>
+                        <span>Avg: {{ item.average_score }}/10</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Company Question Patterns -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+        <div>
+            <h3 class="font-extrabold text-base text-slate-850 dark:text-white mb-4 flex items-center gap-2">
+                <i data-lucide="building-2" class="w-5 h-5 text-indigo-500"></i>
+                Target Question Patterns
+            </h3>
+            
+            <div class="space-y-3 max-h-[280px] overflow-y-auto pr-1">
+                {% for pat in patterns %}
+                    <div class="p-2.5 bg-slate-50 dark:bg-slate-950/60 rounded-xl border border-slate-150 dark:border-slate-850 flex justify-between items-center text-xs">
+                        <div>
+                            <span class="font-extrabold text-slate-800 dark:text-slate-200 block">{{ pat.company }}</span>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{{ pat.category }}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] font-black text-indigo-600 dark:text-indigo-450 block">{{ pat.frequency }} asks</span>
+                            <span class="text-[9px] text-slate-450">{{ pat.difficulty }}</span>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-xs text-slate-400 italic text-center py-8">No patterns loaded.</p>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 text-center font-bold">
+            Updated from historic interview outcomes.
+        </div>
+    </div>
+</div>

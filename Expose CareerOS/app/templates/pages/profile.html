@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile — Expose Autospy{% endblock %}
+{% block page_header %}Professional Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Manage Career Profile</h2>
+        <p class="text-sm text-slate-500 dark:text-slate-400">Keep your statistics and targets up-to-date to align your job search pipeline.</p>
+    </div>
+    
+    <!-- Profile Container for HTMX Inline Swap -->
+    <div id="profile-container">
+        {% include 'components/profile_card.html' %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}Interview Prep — Expose Autospy{% endblock %}
+{% block page_header %}Interview Preparation Workstation{% endblock %}
+
+{% block content %}
+<!-- Page description & action buttons -->
+<div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+        <h2 class="text-2xl font-black text-slate-850 dark:text-white">Academy Workstation</h2>
+        <p class="text-sm text-slate-500 dark:text-slate-400">Track category readiness, test weak areas with adaptive quizzes, and maintain your question database.</p>
+    </div>
+    <div class="flex items-center gap-3.5">
+        <button onclick="openQuizModal()" 
+                class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-550 hover:to-indigo-650 text-white rounded-xl font-bold shadow-md shadow-brand-900/10 transition-all text-sm">
+            <i data-lucide="zap" class="w-4.5 h-4.5"></i>
+            Start Daily Quiz
+        </button>
+        <button onclick="openModal('question-modal')" 
+                class="flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-850 dark:bg-slate-850 dark:hover:bg-slate-800 text-white rounded-xl font-bold shadow-md transition-all text-sm">
+            <i data-lucide="plus" class="w-4.5 h-4.5"></i>
+            Add Question
+        </button>
+    </div>
+</div>
+
+<!-- Academy stats & patterns (Loaded dynamically via HTMX) -->
+<div id="academy-dashboard-container" hx-get="/interviews/academy/data" hx-trigger="load" hx-swap="innerHTML" class="mb-8">
+    <div class="text-center py-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl text-slate-450 italic text-xs font-semibold">
+        <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-brand-500"></i>
+        Loading Academy Dashboard...
+    </div>
+</div>
+
+<div class="mb-6">
+    <h3 class="text-lg font-black text-slate-850 dark:text-white mb-1">Solved Question Library</h3>
+    <p class="text-xs text-slate-450">Review and search your logs of answered questions.</p>
+</div>
+
+<!-- Search & Filtering Section -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+    <!-- Search -->
+    <div class="relative w-full md:w-80">
+        <i data-lucide="search" class="w-4 h-4 text-slate-450 dark:text-slate-500 absolute left-3 top-3.5"></i>
+        <input type="text" name="search" 
+               hx-get="/interviews" 
+               hx-trigger="keyup changed delay:250ms, search" 
+               hx-target="#interview-list-container" 
+               hx-include="[name='difficulty']"
+               value="{{ search_query }}"
+               placeholder="Search questions, companies, topics..." 
+               class="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-slate-800 dark:text-slate-200 font-semibold">
+    </div>
+
+    <!-- Difficulty Filter -->
+    <div class="flex items-center space-x-3 w-full md:w-auto">
+        <label for="difficulty" class="text-xs font-bold text-slate-500 uppercase tracking-wider hidden sm:block">Difficulty:</label>
+        <select name="difficulty" 
+                hx-get="/interviews" 
+                hx-target="#interview-list-container" 
+                hx-include="[name='search']"
+                class="w-full sm:w-48 px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-slate-850 dark:text-slate-200 font-semibold">
+            <option value="">All Difficulties</option>
+            <option value="Easy" {% if selected_difficulty == 'Easy' %}selected{% endif %}>Easy</option>
+            <option value="Medium" {% if selected_difficulty == 'Medium' %}selected{% endif %}>Medium</option>
+            <option value="Hard" {% if selected_difficulty == 'Hard' %}selected{% endif %}>Hard</option>
+        </select>
+    </div>
+</div>
+
+<!-- Interview Questions List Container -->
+<div id="interview-list-container">
+    {% include 'components/interview_list.html' %}
+</div>
+
+<!-- ==========================================
+      MODAL DIALOG: Add Interview Question
+     ========================================== -->
+<div id="question-modal" role="dialog" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm transition-all duration-300">
+    <div class="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]">
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-5">
+            <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                <i data-lucide="help-circle" class="w-5 h-5 text-brand-600 dark:text-brand-400"></i>
+                Add Interview Question
+            </h3>
+            <button onclick="closeModal('question-modal')" class="text-slate-400 hover:text-slate-650 dark:hover:text-slate-200">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Form -->
+        <form hx-post="/interviews" 
+              hx-target="#interview-list-container" 
+              hx-swap="innerHTML"
+              id="add-question-form"
+              class="space-y-4">
+            
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Company -->
+                <div>
+                    <label for="modal-company" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Company Name</label>
+                    <input type="text" id="modal-company" name="company" required placeholder="e.g. Google, Amazon"
+                           class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-semibold text-slate-850 dark:text-slate-100">
+                </div>
+
+                <!-- Category -->
+                <div>
+                    <label for="modal-category" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Category</label>
+                    <input type="text" id="modal-category" name="category" required placeholder="e.g. Algorithms, System Design"
+                           class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-semibold text-slate-855 dark:text-slate-100">
+                </div>
+            </div>
+
+            <!-- Difficulty -->
+            <div>
+                <label for="modal-difficulty" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Difficulty Level</label>
+                <select id="modal-difficulty" name="difficulty" required
+                        class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-semibold text-slate-855 dark:text-slate-100">
+                    <option value="Easy">Easy</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+            </div>
+
+            <!-- Question -->
+            <div>
+                <label for="modal-question" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Question Description</label>
+                <textarea id="modal-question" name="question" rows="2" required placeholder="e.g. What is the difference between TCP and UDP?"
+                          class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-semibold text-slate-855 dark:text-slate-100 resize-none"></textarea>
+            </div>
+
+            <!-- Personal Answer -->
+            <div>
+                <label for="modal-personal_answer" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Your Response / Notes</label>
+                <textarea id="modal-personal_answer" name="personal_answer" rows="3" placeholder="Draft your detailed personal response or talking points..."
+                          class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-semibold text-slate-855 dark:text-slate-100 resize-none"></textarea>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 items-center">
+                <!-- Score -->
+                <div class="col-span-1">
+                    <label for="modal-score" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Score (0-10)</label>
+                    <input type="number" id="modal-score" name="score" min="0" max="10" value="0"
+                           class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-semibold text-slate-855 dark:text-slate-100">
+                </div>
+
+                <!-- Feedback -->
+                <div class="col-span-2">
+                    <label for="modal-feedback" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Assessed Feedback</label>
+                    <input type="text" id="modal-feedback" name="feedback" placeholder="e.g. Needs more clear structure"
+                           class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-semibold text-slate-855 dark:text-slate-100">
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100 dark:border-slate-800 mt-4">
+                <button type="button" onclick="closeModal('question-modal')"
+                        class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-755 text-slate-700 dark:text-slate-300 rounded-xl font-bold transition-colors text-sm">
+                    Cancel
+                </button>
+                <button type="submit" 
+                        class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold shadow-md shadow-brand-900/10 transition-colors text-sm">
+                    Add Question
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==========================================
+      MODAL DIALOG: Adaptive Quiz Console
+     ========================================== -->
+<div id="quiz-modal" role="dialog" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm transition-all duration-300">
+    <div id="quiz-content-container" class="w-full max-w-3xl flex justify-center">
+        <!-- Content loaded dynamically from /interviews/quiz/generate -->
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-xl text-center font-bold text-xs text-slate-450">
+            <i class="w-6 h-6 animate-spin mx-auto mb-2 text-brand-500" data-lucide="loader-2"></i>
+            Assembling adaptive quiz session from bank...
+        </div>
+    </div>
+</div>
+
+<script>
+    document.body.addEventListener('interviewAdded', function () {
+        closeModal('question-modal');
+        document.getElementById('add-question-form').reset();
+        // Update academy status
+        htmx.ajax('GET', '/interviews/academy/data', '#academy-dashboard-container');
+    });
+
+    function openQuizModal() {
+        document.getElementById('quiz-modal').classList.remove('hidden');
+        document.getElementById('quiz-modal').classList.add('flex');
+        htmx.ajax('GET', '/interviews/quiz/generate?quiz_type=daily', '#quiz-content-container');
+    }
+
+    function closeQuizModal() {
+        document.getElementById('quiz-modal').classList.add('hidden');
+        document.getElementById('quiz-modal').classList.remove('flex');
+        // Update academy dashboard metrics
+        htmx.ajax('GET', '/interviews/academy/data', '#academy-dashboard-container');
+    }
+</script>
+{% endblock %}

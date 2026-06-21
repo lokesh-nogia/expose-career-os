@@ -1,0 +1,195 @@
+{% if not edit_mode %}
+<!-- View Profile Component -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-md overflow-hidden transition-all duration-300">
+    <!-- Header banner background -->
+    <div class="h-32 bg-gradient-to-r from-brand-600 to-indigo-600 dark:from-brand-800 dark:to-indigo-950 relative">
+        <div class="absolute -bottom-12 left-8">
+            <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-brand-400 to-indigo-500 flex items-center justify-center text-white font-extrabold text-4xl shadow-lg border-4 border-white dark:border-slate-900">
+                {{ profile.full_name[0]|upper if profile.full_name else 'U' }}
+            </div>
+        </div>
+    </div>
+    
+    <div class="px-8 pt-16 pb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
+            <div>
+                <h3 class="text-2xl font-extrabold text-slate-800 dark:text-white">{{ profile.full_name }}</h3>
+                <p class="text-brand-600 dark:text-brand-400 font-semibold mt-1">{{ profile.current_role or "Software Engineer" }}</p>
+            </div>
+            <div>
+                <button hx-get="/profile/edit" 
+                        hx-target="#profile-container" 
+                        hx-swap="innerHTML"
+                        class="flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-850 dark:bg-slate-850 dark:hover:bg-slate-800 text-white rounded-xl font-bold shadow-sm transition-colors text-sm">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                    Edit Profile
+                </button>
+            </div>
+        </div>
+
+        <!-- Detail Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 py-6 border-b border-slate-100 dark:border-slate-800 text-sm">
+            <!-- Years of Experience -->
+            <div class="flex items-center space-x-4">
+                <div class="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-500 dark:text-slate-400">
+                    <i data-lucide="award" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-450 dark:text-slate-500 block">Experience</span>
+                    <span class="font-bold text-slate-700 dark:text-slate-200 text-base">{{ profile.experience_years }} Years</span>
+                </div>
+            </div>
+
+            <!-- Current Salary -->
+            <div class="flex items-center space-x-4">
+                <div class="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-500 dark:text-slate-400">
+                    <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-450 dark:text-slate-500 block">Current Salary</span>
+                    <span class="font-bold text-slate-700 dark:text-slate-200 text-base">{{ profile.current_salary }} LPA</span>
+                </div>
+            </div>
+
+            <!-- Target Role -->
+            <div class="flex items-center space-x-4">
+                <div class="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-500 dark:text-slate-400">
+                    <i data-lucide="target" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-450 dark:text-slate-500 block">Target Role</span>
+                    <span class="font-bold text-slate-700 dark:text-slate-200 text-base">{{ profile.target_role or "Not Set" }}</span>
+                </div>
+            </div>
+
+            <!-- Target Salary -->
+            <div class="flex items-center space-x-4">
+                <div class="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-500 dark:text-slate-400">
+                    <i data-lucide="trending-up" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-450 dark:text-slate-500 block">Target Salary</span>
+                    <span class="font-bold text-emerald-600 dark:text-emerald-400 text-base">{{ profile.target_salary }} LPA ({{ profile.target_timeline }})</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills Area -->
+        <div class="pt-6">
+            <h4 class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3.5">Skills & Expertises</h4>
+            <div class="flex flex-wrap gap-2">
+                {% if profile.skills %}
+                    {% for skill in profile.skills %}
+                        <span class="text-xs px-3.5 py-1.5 bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-400 rounded-xl font-semibold border border-brand-200/50 dark:border-brand-900/30">
+                            {{ skill.skill_name }} ({{ skill.level }})
+                        </span>
+                    {% endfor %}
+                {% else %}
+                    <span class="text-sm text-slate-400 italic">No skills listed yet. Click edit to add skills.</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- Edit Profile Form Component -->
+<form hx-post="/profile" 
+      hx-target="#profile-container" 
+      hx-swap="innerHTML"
+      class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-lg p-8 transition-all duration-300">
+    
+    <div class="pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
+        <h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+            <i data-lucide="user-cog" class="w-5 h-5 text-brand-600 dark:text-brand-400"></i>
+            Edit Profile Credentials
+        </h3>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- Full Name -->
+        <div>
+            <label for="full_name" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Full Name</label>
+            <input type="text" id="full_name" name="full_name" value="{{ profile.full_name }}" required
+                   class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm text-slate-800 dark:text-slate-100 font-semibold">
+        </div>
+
+        <!-- Current Role -->
+        <div>
+            <label for="current_role" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Current Role</label>
+            <input type="text" id="current_role" name="current_role" value="{{ profile.current_role }}" required
+                   class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm text-slate-800 dark:text-slate-100 font-semibold">
+        </div>
+
+        <!-- Experience Years -->
+        <div>
+            <label for="experience_years" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Experience (Years)</label>
+            <input type="number" id="experience_years" name="experience_years" value="{{ profile.experience_years }}" min="0" required
+                   class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm text-slate-800 dark:text-slate-100 font-semibold">
+        </div>
+
+        <!-- Target Role -->
+        <div>
+            <label for="target_role" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Target Role</label>
+            <input type="text" id="target_role" name="target_role" value="{{ profile.target_role }}" required
+                   class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm text-slate-800 dark:text-slate-100 font-semibold">
+        </div>
+
+        <!-- Current Salary -->
+        <div>
+            <label for="current_salary" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Current Salary (LPA)</label>
+            <input type="number" step="0.1" id="current_salary" name="current_salary" value="{{ profile.current_salary }}" min="0" required
+                   class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm text-slate-800 dark:text-slate-100 font-semibold">
+        </div>
+
+        <!-- Target Salary -->
+        <div>
+            <label for="target_salary" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Target Salary (LPA)</label>
+            <input type="number" step="0.1" id="target_salary" name="target_salary" value="{{ profile.target_salary }}" min="0" required
+                   class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm text-slate-800 dark:text-slate-100 font-semibold">
+        </div>
+
+        <!-- Target Timeline -->
+        <div>
+            <label for="target_timeline" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Target Timeline</label>
+            <select id="target_timeline" name="target_timeline" required
+                    class="w-full px-3 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-semibold text-slate-800 dark:text-slate-100">
+                <option value="3 Months" {% if profile.target_timeline == '3 Months' %}selected{% endif %}>3 Months</option>
+                <option value="6 Months" {% if profile.target_timeline == '6 Months' %}selected{% endif %}>6 Months</option>
+                <option value="12 Months" {% if profile.target_timeline == '12 Months' %}selected{% endif %}>12 Months</option>
+                <option value="18 Months" {% if profile.target_timeline == '18 Months' %}selected{% endif %}>18 Months</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Skills -->
+    <div class="mb-8">
+        <label for="skills" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Skills (comma separated)</label>
+        <textarea id="skills" name="skills" rows="3" required
+                  class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm text-slate-800 dark:text-slate-100 font-semibold resize-none">{{ profile.skills|map(attribute='skill_name')|join(', ') }}</textarea>
+        <span class="text-xs text-slate-450 dark:text-slate-500 mt-1.5 block">Format: Python, FastAPI, SQLite, HTMX, TailwindCSS</span>
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex items-center justify-end space-x-3.5 border-t border-slate-100 dark:border-slate-800 pt-6">
+        <button type="button" 
+                hx-get="/profile/view" 
+                hx-target="#profile-container" 
+                hx-swap="innerHTML"
+                class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-350 rounded-xl font-bold transition-colors text-sm">
+            Cancel
+        </button>
+        <button type="submit" 
+                class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold shadow-md shadow-brand-900/10 transition-colors text-sm">
+            Save Changes
+        </button>
+    </div>
+</form>
+{% endif %}
+
+<!-- Out-Of-Band Swaps to refresh layout top bar details dynamically on save -->
+{% if oob_update %}
+<span id="header-user-name" hx-swap-oob="true">{{ profile.full_name }}</span>
+<span id="header-user-role" hx-swap-oob="true">{{ profile.current_role }}</span>
+<span id="header-user-initial" hx-swap-oob="true">{{ profile.full_name[0]|upper if profile.full_name else 'U' }}</span>
+{% endif %}

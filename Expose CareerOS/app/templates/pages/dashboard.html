@@ -1,0 +1,859 @@
+{% extends 'base.html' %}
+
+{% block title %}Career Growth OS Workstation — Expose Autospy{% endblock %}
+{% block page_header %}Career OS Workstation{% endblock %}
+
+{% block content %}
+<!-- Top Header Control Bar -->
+<div class="mb-8 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
+    <div>
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-800 dark:text-slate-100 flex items-center gap-2">
+            Welcome, <span class="bg-gradient-to-r from-brand-600 to-indigo-600 dark:from-brand-400 dark:to-indigo-400 bg-clip-text text-transparent">{{ profile.full_name or "Explorer" }}</span>!
+        </h2>
+        <p class="text-slate-500 dark:text-slate-400 mt-1 font-medium">
+            Analyzing target path alignment for <strong class="text-slate-700 dark:text-slate-350">{{ profile.target_role or "Software Engineer" }}</strong>.
+        </p>
+    </div>
+    
+    <!-- Data Freshness Widget & Discovery Control -->
+    <div class="flex flex-wrap items-center gap-4">
+        {% if freshness %}
+            <div class="flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-2.5 rounded-2xl shadow-sm text-xs font-semibold">
+                <span class="flex h-2.5 w-2.5 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-{{ freshness.status_color }}-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-{{ freshness.status_color }}-500"></span>
+                </span>
+                <div>
+                    <span class="text-slate-400 font-bold block uppercase text-[9px] tracking-wider">Market Data Age</span>
+                    <span class="text-slate-700 dark:text-slate-200">{{ freshness.status_label }} ({{ freshness.age_text }})</span>
+                </div>
+            </div>
+        {% endif %}
+        
+        <form action="/dashboard/discover" method="POST">
+            <button type="submit" 
+                    class="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-brand-600 to-indigo-650 hover:from-brand-500 hover:to-indigo-600 text-white rounded-xl font-bold shadow-md shadow-brand-900/10 transition-all text-sm">
+                <i data-lucide="compass" class="w-4.5 h-4.5"></i>
+                Discover Careers
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- TOP GRID: Notifications, Coach & Resume Intelligence -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    
+    <!-- 1. Career Coach Action Planning Panel -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 dark:bg-indigo-400/5 rounded-bl-full pointer-events-none"></div>
+        <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+                <h3 class="font-bold text-base text-slate-850 dark:text-white flex items-center gap-2">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-indigo-500"></i>
+                    Career Coach
+                </h3>
+                <span class="text-[9px] px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 rounded-md font-extrabold uppercase">Weekly Plan</span>
+            </div>
+            
+            {% if coach_plan %}
+                <div class="space-y-4">
+                    <div class="p-3 bg-indigo-50/40 dark:bg-indigo-950/10 border border-indigo-100/50 dark:border-indigo-900/10 rounded-2xl">
+                        <span class="text-[9px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-widest block mb-1">Weekly Objective</span>
+                        <p class="font-extrabold text-slate-800 dark:text-slate-200 text-xs leading-tight">{{ coach_plan.weekly_objective }}</p>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Action Tasks</span>
+                        <div class="space-y-2 text-xs">
+                            {% for t in coach_plan.tasks %}
+                                <div class="flex items-start gap-2">
+                                    <i data-lucide="circle-dot" class="w-3.5 h-3.5 text-indigo-500 mt-0.5 shrink-0"></i>
+                                    <span class="text-slate-600 dark:text-slate-400 font-medium">{{ t }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-xs text-slate-400 italic text-center py-8">Coach plan unavailable. Complete onboarding details first.</p>
+            {% endif %}
+        </div>
+        
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2 text-[10px] text-slate-500 dark:text-slate-450 font-bold">
+            <div class="flex items-center gap-1.5">
+                <i data-lucide="trending-up" class="w-3.5 h-3.5 text-emerald-500"></i>
+                <span>{{ coach_plan.expected_salary_impact if coach_plan else "+0.0 LPA" }}</span>
+            </div>
+            <div class="flex items-center gap-1.5 justify-end">
+                <i data-lucide="target" class="w-3.5 h-3.5 text-brand-500"></i>
+                <span>{{ coach_plan.expected_readiness_gain if coach_plan else "+0% Readiness" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Resume Intelligence & Version Control Panel -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+                <h3 class="font-bold text-base text-slate-850 dark:text-white flex items-center gap-2">
+                    <i data-lucide="file-text" class="w-5 h-5 text-brand-500"></i>
+                    Resume Intelligence
+                </h3>
+                <span class="text-[9px] px-2 py-0.5 bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 rounded-md font-extrabold uppercase">Audit</span>
+            </div>
+            
+            <div class="space-y-4">
+                {% if resumes_data %}
+                    <div class="space-y-3 max-h-[160px] overflow-y-auto pr-1">
+                        {% for item in resumes_data %}
+                            <div class="p-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-150 dark:border-slate-850 rounded-2xl flex items-center justify-between text-xs">
+                                <div class="min-w-0">
+                                    <h4 class="font-extrabold text-slate-850 dark:text-white truncate">{{ item.resume.title }}</h4>
+                                    <span class="text-[9px] font-bold text-slate-450 block mt-0.5">Version {{ item.version.version_number }} • ATS Score: {{ item.version.match_score|int }}%</span>
+                                </div>
+                                <span class="px-2 py-1 bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 font-black rounded-lg scale-90 shrink-0">Active</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-6">
+                        <i data-lucide="file-warning" class="w-8 h-8 text-slate-400 mx-auto mb-2"></i>
+                        <p class="text-xs text-slate-400 italic">No resume variants generated. Approve a job below to create one.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 font-semibold text-center leading-tight">
+            Resume optimizations only use verified credentials. No fabrication.
+        </div>
+    </div>
+
+    <!-- 3. Notifications Panel -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+                <h3 class="font-bold text-base text-slate-850 dark:text-white flex items-center gap-2">
+                    <i data-lucide="bell" class="w-5 h-5 text-rose-500"></i>
+                    Workspace Alerts
+                </h3>
+                {% if notifications %}
+                    <button hx-post="/dashboard/notifications/read" 
+                            hx-swap="none"
+                            onclick="clearNotificationsDOM()"
+                            class="text-[9px] font-extrabold text-rose-600 hover:underline">
+                        Clear All
+                    </button>
+                {% endif %}
+            </div>
+            
+            <div id="notifications-list" class="space-y-2.5 max-h-[160px] overflow-y-auto pr-1">
+                {% for notif in notifications %}
+                    <div id="notif-{{ notif.id }}" class="p-2.5 bg-rose-50/30 dark:bg-rose-950/10 border border-rose-100/30 dark:border-rose-900/10 rounded-2xl flex gap-2.5 text-xs text-slate-650 dark:text-slate-400">
+                        <i data-lucide="info" class="w-4 h-4 text-rose-500 mt-0.5 shrink-0"></i>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-medium leading-normal">{{ notif.message }}</p>
+                        </div>
+                        <button hx-post="/dashboard/notifications/{{ notif.id }}/read"
+                                hx-target="#notif-{{ notif.id }}"
+                                hx-swap="delete"
+                                class="text-slate-400 hover:text-rose-500 self-start">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                {% else %}
+                    <div class="text-center py-8 text-slate-400 italic text-xs">
+                        <i data-lucide="check-circle" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
+                        No new unread alerts.
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <script>
+            function clearNotificationsDOM() {
+                const list = document.getElementById("notifications-list");
+                list.innerHTML = `<div class="text-center py-8 text-slate-400 italic text-xs"><i data-lucide="check-circle" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>No new unread alerts.</div>`;
+                lucide.createIcons();
+            }
+        </script>
+        
+        <div class="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 text-center font-bold uppercase">
+            Workspace events feed
+        </div>
+    </div>
+</div>
+
+<!-- AGENTIC CAREER EXECUTION LAYER -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+    
+    <!-- 1. Agent Recommendations (Human-in-the-Loop) -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+                <h3 class="font-bold text-base text-slate-850 dark:text-white flex items-center gap-2">
+                    <i data-lucide="cpu" class="w-5 h-5 text-brand-500 animate-pulse"></i>
+                    Agent Recommendations
+                </h3>
+                <span class="text-[9px] px-2 py-0.5 bg-brand-50 dark:bg-brand-950/20 text-brand-600 dark:text-brand-400 rounded-md font-extrabold uppercase">Human-Supervised</span>
+            </div>
+            
+            <div class="space-y-4 max-h-[220px] overflow-y-auto pr-1" id="agent-recommendations-list">
+                {% for rec in recommendations %}
+                    <div id="rec-card-{{ loop.index }}" class="p-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-150 dark:border-slate-850 rounded-2xl">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[9px] font-black text-brand-500 uppercase">Priority {{ rec.priority }}</span>
+                            <span class="text-[9px] font-bold text-emerald-650">Impact: {{ rec.salary_impact }}</span>
+                        </div>
+                        <h4 class="font-extrabold text-slate-800 dark:text-white mt-1 text-xs">Learn {{ rec.topic }}</h4>
+                        <p class="text-[10px] text-slate-500 mt-1 leading-normal font-semibold">{{ rec.reason }} • Confidence: {{ rec.confidence }}</p>
+                        
+                        <div class="flex gap-2 mt-3">
+                            <button hx-post="/dashboard/agents/approve"
+                                    hx-vals='{"topic": "{{ rec.topic }}"}'
+                                    hx-target="#rec-card-{{ loop.index }}"
+                                    hx-swap="outerHTML"
+                                    class="flex-1 py-1.5 px-3 bg-brand-650 hover:bg-brand-600 text-white rounded-lg text-[10px] font-bold transition-all shadow-sm">
+                                Approve
+                            </button>
+                            <button hx-post="/dashboard/agents/reject"
+                                    hx-vals='{"topic": "{{ rec.topic }}"}'
+                                    hx-target="#rec-card-{{ loop.index }}"
+                                    hx-swap="outerHTML"
+                                    class="py-1.5 px-3 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/20 dark:text-rose-455 rounded-lg text-[10px] font-bold transition-all border border-rose-200/20">
+                                Reject
+                            </button>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-xs text-slate-400 italic text-center py-8">No pending recommendations. All goals fully aligned!</p>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 text-center font-semibold leading-tight">
+            Human approval is mandatory before any execution.
+        </div>
+    </div>
+
+    <!-- 2. Weekly Executive Report Summary -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+                <h3 class="font-bold text-base text-slate-850 dark:text-white flex items-center gap-2">
+                    <i data-lucide="file-bar-chart" class="w-5 h-5 text-indigo-500"></i>
+                    Executive Report
+                </h3>
+                <a href="/dashboard/executive-report" 
+                   class="text-[10px] font-extrabold text-brand-600 hover:underline flex items-center gap-1">
+                   View Full <i data-lucide="external-link" class="w-3 h-3"></i>
+                </a>
+            </div>
+            
+            <div class="space-y-3.5 text-xs">
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-500 font-medium">Career Health Score:</span>
+                    <span class="font-extrabold text-slate-800 dark:text-slate-200 bg-indigo-50 dark:bg-indigo-950/20 px-2 py-0.5 rounded">{{ career_score.score|int if career_score else 75 }}/100</span>
+                </div>
+                
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-500 font-medium">Readiness Trend:</span>
+                    <span class="font-extrabold text-emerald-600 flex items-center gap-0.5">
+                        <i data-lucide="trending-up" class="w-3.5 h-3.5 animate-bounce"></i>
+                        +{{ readiness.score|int if readiness else 0 }}% total
+                    </span>
+                </div>
+                
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-500 font-medium">Salary Trend:</span>
+                    <span class="font-extrabold text-emerald-600 flex items-center gap-0.5">
+                        <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+                        {{ salary_intel.estimated_market_salary if salary_intel else 0 }} LPA
+                    </span>
+                </div>
+
+                <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                    <span class="text-slate-500 font-medium">Expected Salary Growth:</span>
+                    <span class="font-extrabold text-indigo-600 dark:text-indigo-400">+{{ coach_plan.expected_salary_impact if coach_plan else "+0.0" }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 text-center font-bold">
+            Interactive performance summary
+        </div>
+    </div>
+
+    <!-- 3. Learning Adjustments -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+                <h3 class="font-bold text-base text-slate-850 dark:text-white flex items-center gap-2">
+                    <i data-lucide="brain" class="w-5 h-5 text-indigo-500 animate-pulse"></i>
+                    Learning Adjustments
+                </h3>
+                <span class="text-[9px] px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 rounded-md font-extrabold uppercase">Outcome Learning</span>
+            </div>
+            
+            <div class="space-y-3.5 text-xs max-h-[220px] overflow-y-auto pr-1">
+                {% for adj in adjustments %}
+                    <div class="p-3 bg-indigo-50/20 dark:bg-indigo-950/10 border border-indigo-100/10 dark:border-indigo-900/10 rounded-2xl">
+                        <span class="text-[9px] font-black text-indigo-500 block uppercase mb-1">{{ adj.category }}</span>
+                        <p class="font-bold text-slate-700 dark:text-slate-200 leading-tight">{{ adj.message }}</p>
+                    </div>
+                {% else %}
+                    <p class="text-xs text-slate-400 italic text-center py-8">All solved categories have high retention (>= 7.0/10).</p>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 text-center font-bold">
+            Continuous quiz performance tuning
+        </div>
+    </div>
+</div>
+
+<!-- APPLICATION REVIEW QUEUE (PHASE 5) -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm mb-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-6 gap-3">
+        <div>
+            <h3 class="font-bold text-lg text-slate-850 dark:text-white flex items-center gap-2">
+                <i data-lucide="folder-check" class="w-5.5 h-5.5 text-brand-500"></i>
+                Application Packages Workflow Queue
+            </h3>
+            <p class="text-xs text-slate-450 mt-1">Review custom packages, export text contents, approve, and track submissions.</p>
+        </div>
+        <span class="text-xs font-bold text-slate-450 uppercase tracking-widest bg-slate-50 dark:bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-100 dark:border-slate-850">
+            {{ packages|length }} Active Drafts
+        </span>
+    </div>
+
+    {% if packages|length == 0 %}
+        <div class="text-center py-10 text-slate-450 italic text-sm">
+            <i data-lucide="clipboard-list" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
+            No package drafts. Approve a job posting from the discovery review queue to generate one.
+        </div>
+    {% else %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for pkg in packages %}
+                <div id="package-card-{{ pkg.id }}" class="border border-slate-200 dark:border-slate-850 bg-white dark:bg-slate-950 rounded-2xl p-5 flex flex-col justify-between shadow-sm relative group hover:border-indigo-500 dark:hover:border-indigo-500 transition-all duration-200">
+                    <!-- Match Score Badge -->
+                    <div class="absolute right-4 top-4 bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-xs font-black px-2.5 py-1 rounded-lg">
+                        {{ pkg.match_score|int }}% Match
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-extrabold text-slate-850 dark:text-white text-base truncate pr-20">{{ pkg.job.title if pkg.job else "Target Role" }}</h4>
+                        <span class="text-xs text-slate-450 font-bold block mt-0.5">{{ pkg.job.company if pkg.job else "Target Company" }}</span>
+                        
+                        <div class="mt-3.5 p-3 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 rounded-xl text-[11px] leading-relaxed text-slate-650 dark:text-slate-400">
+                            {{ pkg.salary_analysis }}
+                        </div>
+                        
+                        <!-- Missing Skills -->
+                        <div class="mt-4 pt-3 border-t border-dashed border-slate-100 dark:border-slate-850">
+                            <span class="text-[9px] font-black text-rose-500 uppercase tracking-wider block mb-1.5">Missing Skills Gaps</span>
+                            <div class="text-slate-500 dark:text-slate-455 text-[10px] leading-normal font-semibold">
+                                {{ pkg.missing_skills }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="mt-5 pt-4 border-t border-slate-100 dark:border-slate-850 flex flex-col gap-2">
+                        <div class="flex items-center justify-between text-[11px] font-bold text-slate-450 mb-1">
+                            <span>Status:</span>
+                            <div id="pkg-status-badge-{{ pkg.id }}">
+                                {% if pkg.status == "Approved" %}
+                                    <span class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-extrabold rounded-lg text-[10px] uppercase">Approved</span>
+                                {% else %}
+                                    <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-655 dark:text-slate-350 font-extrabold rounded-lg text-[10px] uppercase">Draft</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <button hx-post="/dashboard/packages/{{ pkg.id }}/approve"
+                                    hx-target="#pkg-status-badge-{{ pkg.id }}"
+                                    hx-swap="innerHTML"
+                                    class="flex-1 py-2 bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition-all border border-slate-200 dark:border-slate-800">
+                                Approve Draft
+                            </button>
+                            <a href="/dashboard/packages/{{ pkg.id }}/export"
+                               class="py-2 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-650 dark:bg-indigo-950/20 dark:text-indigo-400 rounded-xl transition-all border border-indigo-200/10 text-xs font-bold flex items-center justify-center animate-pulse"
+                               title="Export Package Files"
+                               download>
+                                <i data-lucide="download" class="w-4 h-4"></i>
+                            </a>
+                            <button hx-post="/dashboard/packages/{{ pkg.id }}/submit"
+                                    hx-target="#package-card-{{ pkg.id }}"
+                                    hx-swap="delete"
+                                    class="py-2 px-3 bg-brand-650 hover:bg-brand-600 text-white rounded-xl font-bold text-xs shadow-md shadow-brand-900/10 transition-all"
+                                    title="Mark as Submitted">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<!-- INTERACTIVE JOB REVIEW QUEUE -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm mb-8">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-6 gap-3">
+        <div>
+            <h3 class="font-bold text-lg text-slate-850 dark:text-white flex items-center gap-2">
+                <i data-lucide="briefcase" class="w-5.5 h-5.5 text-brand-500"></i>
+                Job Application Review Queue
+            </h3>
+            <p class="text-xs text-slate-450 mt-1">Real opportunities matching your targets. No synthetic data.</p>
+        </div>
+        <span class="text-xs font-bold text-slate-450 uppercase tracking-widest bg-slate-50 dark:bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-100 dark:border-slate-850">
+            {{ queue_jobs|length }} Pending Review
+        </span>
+    </div>
+
+    {% if total_postings == 0 %}
+        <!-- CRITICAL RULE: Explicitly display No real market data available -->
+        <div class="text-center py-12 bg-slate-50/50 dark:bg-slate-950/40 rounded-3xl border border-dashed border-slate-200 dark:border-slate-850">
+            <i data-lucide="database-backup" class="w-12 h-12 text-slate-400 mx-auto mb-4 animate-pulse"></i>
+            <h4 class="text-base font-extrabold text-slate-700 dark:text-slate-300">No real market data available</h4>
+            <p class="text-xs text-slate-450 mt-1.5 max-w-md mx-auto">
+                No job postings have been imported. Click <strong class="text-brand-500">"Discover Careers"</strong> to load real data from the CSV import layer.
+            </p>
+        </div>
+    {% elif queue_jobs|length == 0 %}
+        <div class="text-center py-10 text-slate-450 italic text-sm">
+            <i data-lucide="check-square" class="w-10 h-10 text-emerald-500/80 mx-auto mb-3"></i>
+            All discovered opportunities have been processed!
+        </div>
+    {% else %}
+        <!-- Jobs Grid List -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for item in queue_jobs %}
+                <div id="job-card-{{ item.job.id }}" class="border border-slate-200 dark:border-slate-850 bg-white dark:bg-slate-950 rounded-2xl p-5 flex flex-col justify-between shadow-sm relative group hover:border-brand-500 dark:hover:border-brand-500 transition-all duration-200">
+                    <!-- Match Badge -->
+                    <div class="absolute right-4 top-4 bg-brand-50 dark:bg-brand-950 text-brand-700 dark:text-brand-400 text-xs font-black px-2.5 py-1 rounded-lg">
+                        {{ item.match.match_score|int }}% Match
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-extrabold text-slate-850 dark:text-white text-base truncate pr-20">{{ item.job.title }}</h4>
+                        <span class="text-xs text-slate-450 font-bold block mt-0.5">{{ item.job.company }}</span>
+                        
+                        <div class="flex items-center gap-4 text-[10px] font-semibold text-slate-400 mt-3.5">
+                            <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i>{{ item.job.location }}</span>
+                            <span class="flex items-center gap-1"><i data-lucide="dollar-sign" class="w-3.5 h-3.5"></i>{{ item.job.salary }} LPA</span>
+                        </div>
+                        
+                        <!-- Missing Skills Tag Gaps -->
+                        <div class="mt-4 pt-3 border-t border-dashed border-slate-100 dark:border-slate-850">
+                            <span class="text-[9px] font-black text-rose-500 uppercase tracking-wider block mb-2">Gaps to Close</span>
+                            <div class="flex flex-wrap gap-1">
+                                {% for gap in item.match.missing_skills %}
+                                    <span class="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-455 text-[10px] font-bold rounded">
+                                        {{ gap }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-[10px] text-emerald-600 dark:text-emerald-400 italic font-semibold">100% Skill Alignment!</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Review Actions -->
+                    <div class="mt-5 pt-4 border-t border-slate-100 dark:border-slate-850 flex gap-2.5">
+                        <button onclick="openReviewModal({{ item.job.id }})" 
+                                class="flex-1 py-2 bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition-all border border-slate-200 dark:border-slate-800">
+                            Review & Optimize
+                        </button>
+                        <button hx-post="/jobs/queue/{{ item.job.id }}/reject"
+                                hx-target="#job-card-{{ item.job.id }}"
+                                hx-swap="delete"
+                                class="p-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-900/25 text-rose-600 dark:text-rose-400 rounded-xl transition-all"
+                                title="Reject Posting">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal review block -->
+                <div id="review-modal-{{ item.job.id }}" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl animate-in fade-in-50 zoom-in-95 duration-200">
+                        <!-- Header -->
+                        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/30">
+                            <div>
+                                <h4 class="text-lg font-black text-slate-850 dark:text-white">{{ item.job.title }}</h4>
+                                <span class="text-xs text-slate-450 font-bold block">{{ item.job.company }} • {{ item.job.location }}</span>
+                            </div>
+                            <button onclick="closeReviewModal({{ item.job.id }})" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                                <i data-lucide="x" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="p-6 overflow-y-auto space-y-6 text-xs text-slate-650 dark:text-slate-400">
+                            <!-- Match Analysis -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="p-4 bg-brand-50/20 dark:bg-brand-950/10 border border-brand-100/50 dark:border-brand-900/10 rounded-2xl">
+                                    <h5 class="font-extrabold text-brand-650 dark:text-brand-450 uppercase tracking-wider text-[10px] mb-3">Target Match Breakdown</h5>
+                                    <div class="space-y-2 font-semibold text-[11px]">
+                                        <div class="flex justify-between">
+                                            <span>Skills Correlation</span>
+                                            <span>{{ item.match.breakdown.skill_match|int }}%</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Seniority Alignment</span>
+                                            <span>{{ item.match.breakdown.experience_match|int }}%</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Salary Band Compatibility</span>
+                                            <span>{{ item.match.breakdown.salary_match|int }}%</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Role Compatibility</span>
+                                            <span>{{ item.match.breakdown.role_match|int }}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-4 bg-amber-50/20 dark:bg-amber-950/10 border border-amber-100/50 dark:border-amber-900/10 rounded-2xl">
+                                    <h5 class="font-extrabold text-amber-650 dark:text-amber-450 uppercase tracking-wider text-[10px] mb-2">Resume Tuning Preview</h5>
+                                    <p class="leading-relaxed font-medium">
+                                        Skills matching target job (e.g. <strong>{{ item.match.missing_skills|join(', ') or 'Core targets' }}</strong>) will be reordered to top of resume to meet ATS requirements.
+                                    </p>
+                                    <span class="text-[9px] font-bold text-amber-650 dark:text-amber-400 mt-2 block">No fabrication rule: only verified skills reordered.</span>
+                                </div>
+                            </div>
+
+                            <!-- Tabs for Cover Letter -->
+                            <div>
+                                <h5 class="font-extrabold text-slate-800 dark:text-white uppercase tracking-wider text-[10px] mb-2 flex items-center gap-1.5">
+                                    <i data-lucide="file-signature" class="w-4 h-4 text-brand-500"></i>
+                                    Custom Cover Letter Draft
+                                </h5>
+                                <textarea class="w-full h-40 p-4 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-mono text-[10px] rounded-2xl focus:outline-none focus:border-brand-500 leading-normal" readonly>{{ item.cover_letter }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Footer Actions -->
+                        <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30 flex justify-between gap-3">
+                            <button onclick="closeReviewModal({{ item.job.id }})" 
+                                    class="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-800 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-200 rounded-xl font-bold text-xs">
+                                Cancel
+                            </button>
+                            <div class="flex gap-2">
+                                <button hx-post="/jobs/queue/{{ item.job.id }}/save"
+                                        hx-target="#job-card-{{ item.job.id }}"
+                                        hx-swap="delete"
+                                        onclick="closeReviewModal({{ item.job.id }})"
+                                        class="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-bold text-xs">
+                                    Save Opportunity
+                                </button>
+                                <button hx-post="/jobs/queue/{{ item.job.id }}/approve"
+                                        hx-target="#job-card-{{ item.job.id }}"
+                                        hx-swap="delete"
+                                        onclick="closeReviewModal({{ item.job.id }})"
+                                        class="px-5 py-2.5 bg-brand-650 hover:bg-brand-600 text-white rounded-xl font-bold text-xs shadow-md shadow-brand-900/10">
+                                    Approve & Prepare
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <script>
+            function openReviewModal(jobId) {
+                document.getElementById('review-modal-' + jobId).classList.remove('hidden');
+            }
+            function closeReviewModal(jobId) {
+                document.getElementById('review-modal-' + jobId).classList.add('hidden');
+            }
+        </script>
+    {% endif %}
+</div>
+
+<!-- REMAINING OR ORIGINAL WIDGETS -->
+<!-- TOP GRID: Career Score, Mission, Salary, Readiness, Roadmap, Trends -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Career Score Rating -->
+    <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center md:items-stretch gap-6 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-brand-500/5 dark:bg-brand-400/5 rounded-bl-full pointer-events-none"></div>
+        <div class="flex flex-col items-center justify-center shrink-0">
+            <div class="relative w-32 h-32 flex items-center justify-center">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" class="text-slate-100 dark:text-slate-800" fill="transparent" />
+                    <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" class="text-brand-500 transition-all duration-500" fill="transparent" 
+                            stroke-dasharray="251.2" 
+                            stroke-dashoffset="{{ 251.2 - (251.2 * (career_score.score or 0) / 100) }}" />
+                </svg>
+                <div class="absolute flex flex-col items-center">
+                    <span class="text-3xl font-extrabold text-slate-850 dark:text-white tracking-tighter">{{ career_score.score|int }}</span>
+                    <span class="text-[9px] font-bold text-slate-450 uppercase tracking-widest">Score</span>
+                </div>
+            </div>
+            <h4 class="font-extrabold text-sm text-slate-800 dark:text-slate-200 mt-3.5 text-center">Career Score Rating</h4>
+        </div>
+        <div class="flex-1 flex flex-col justify-between">
+            <div class="space-y-3">
+                <h4 class="font-bold text-xs uppercase text-slate-400 tracking-wider">Metrics Breakdown</h4>
+                <div class="grid grid-cols-2 gap-x-6 gap-y-2.5 text-xs font-semibold">
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-[11px]">
+                            <span class="text-slate-500">Market Alignment</span>
+                            <span>{{ career_score.breakdown.market_alignment|int }}/40</span>
+                        </div>
+                        <div class="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-blue-500" style="width: {{ (career_score.breakdown.market_alignment / 40) * 100 }}%"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-[11px]">
+                            <span class="text-slate-500">Skill Depth</span>
+                            <span>{{ career_score.breakdown.skill_depth|int }}/30</span>
+                        </div>
+                        <div class="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-amber-500" style="width: {{ (career_score.breakdown.skill_depth / 30) * 100 }}%"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-[11px]">
+                            <span class="text-slate-500">Interview Readiness</span>
+                            <span>{{ career_score.breakdown.interview_readiness|int }}/20</span>
+                        </div>
+                        <div class="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-purple-500" style="width: {{ (career_score.breakdown.interview_readiness / 20) * 100 }}%"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-[11px]">
+                            <span class="text-slate-500">Learning Progress</span>
+                            <span>{{ career_score.breakdown.learning_progress|int }}/10</span>
+                        </div>
+                        <div class="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-emerald-500" style="width: {{ (career_score.breakdown.learning_progress / 10) * 100 }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-800 text-xs">
+                <span class="font-extrabold text-slate-700 dark:text-slate-300 block mb-2">⚡ Quick Wins to Boost Score:</span>
+                <ul class="space-y-1 text-slate-500 dark:text-slate-400 font-medium">
+                    {% for win in career_score.quick_wins %}
+                        <li class="flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                            {{ win }}
+                        </li>
+                    {% else %}
+                        <li class="text-emerald-600 dark:text-emerald-450 italic">Your profile is fully optimized!</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Mission -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+                <h3 class="font-bold text-base text-slate-850 dark:text-white flex items-center gap-2">
+                    <i data-lucide="check-square" class="w-5 h-5 text-brand-500"></i>
+                    Today's Mission
+                </h3>
+            </div>
+            <div class="space-y-3 text-xs">
+                {% for task in daily_mission.tasks %}
+                    <div class="flex items-start gap-2.5 p-2 bg-slate-50 dark:bg-slate-950/60 rounded-xl border border-slate-100 dark:border-slate-850">
+                        <input type="checkbox" class="w-4 h-4 accent-brand-500 rounded mt-0.5 cursor-pointer shrink-0">
+                        <div class="min-w-0">
+                            <p class="font-bold text-slate-800 dark:text-slate-200 leading-tight">
+                                {{ task.description }}
+                                {% if task.duration %}
+                                    <span class="text-[9px] font-extrabold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/40 px-1.5 py-0.5 rounded ml-1.5 shrink-0">{{ task.duration }}</span>
+                                {% endif %}
+                            </p>
+                            <span class="text-[9px] font-bold text-slate-440 mt-1 block">Category: {{ task.linked_to }}</span>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-slate-400 italic text-center py-6">Mission complete or no tasks found.</p>
+                {% endfor %}
+            </div>
+            {% if daily_mission.expected_readiness_gain %}
+                <div class="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-500 dark:text-slate-400 font-extrabold text-center">
+                    Expected Readiness Gain: <span class="text-indigo-650 dark:text-indigo-400">+{{ daily_mission.expected_readiness_gain }}%</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Salary Intel -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-5">
+            <h3 class="font-bold text-base text-slate-850 dark:text-white flex items-center gap-2">
+                <i data-lucide="dollar-sign" class="w-5 h-5 text-emerald-500"></i>
+                Salary Intelligence Analysis
+            </h3>
+        </div>
+        <div class="grid grid-cols-3 gap-3 mb-6 text-center text-xs">
+            <div class="bg-slate-50 dark:bg-slate-950/40 p-3 rounded-xl border border-slate-100 dark:border-slate-850">
+                <span class="text-[10px] font-bold text-slate-400 block uppercase mb-1">Current</span>
+                <span class="font-extrabold text-slate-700 dark:text-slate-350">{{ profile.current_salary }} {{ feature_flags.currency_symbol or "LPA" }}</span>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-950/40 p-3 rounded-xl border border-slate-100 dark:border-slate-850">
+                <span class="text-[10px] font-bold text-slate-400 block uppercase mb-1">Target</span>
+                <span class="font-extrabold text-emerald-600 dark:text-emerald-450">{{ profile.target_salary }} {{ feature_flags.currency_symbol or "LPA" }}</span>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-950/40 p-3 rounded-xl border border-slate-100 dark:border-slate-850">
+                <span class="text-[10px] font-bold text-slate-400 block uppercase mb-1">Market Average</span>
+                <span class="font-extrabold text-brand-600 dark:text-brand-450">{{ salary_intel.estimated_market_salary }} {{ feature_flags.currency_symbol or "LPA" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Readiness -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-5">
+                <h3 class="font-bold text-base text-slate-850 dark:text-white flex items-center gap-2">
+                    <i data-lucide="target" class="w-5 h-5 text-indigo-500"></i>
+                    Target Role Readiness
+                </h3>
+                <span class="font-extrabold text-indigo-600 dark:text-indigo-400 text-sm bg-indigo-50 dark:bg-indigo-950/30 px-3 py-1 rounded-lg">
+                    {{ readiness.score|int }}% Ready
+                </span>
+            </div>
+
+            <!-- Matching vs Gaps lists -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs mb-4">
+                <!-- Matched -->
+                <div class="space-y-2">
+                    <span class="font-extrabold text-emerald-650 dark:text-emerald-450 flex items-center gap-1.5">
+                        <i data-lucide="check" class="w-4 h-4 stroke-[2.5]"></i>
+                        Matched Skills
+                    </span>
+                    <div class="flex flex-wrap gap-1.5">
+                        {% for skill in readiness.matched_skills %}
+                            <span class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-450 border border-emerald-100 dark:border-emerald-900/20 font-bold rounded-lg">
+                                {{ skill }}
+                            </span>
+                        {% else %}
+                            <span class="text-xs text-slate-450 italic">None matched yet.</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Missing Gaps -->
+                <div class="space-y-2">
+                    <span class="font-extrabold text-rose-500 flex items-center gap-1.5">
+                        <i data-lucide="x" class="w-4 h-4 stroke-[2.5]"></i>
+                        Core Skill Gaps
+                    </span>
+                    <div class="flex flex-wrap gap-1.5">
+                        {% for skill in readiness.missing_skills %}
+                            <span class="px-2.5 py-1 bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-455 border border-rose-100 dark:border-rose-900/20 font-bold rounded-lg">
+                                {{ skill }}
+                            </span>
+                        {% else %}
+                            <span class="text-xs text-emerald-600 dark:text-emerald-450 italic">No missing gaps! You are aligned.</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Readiness Trajectory Predictions (Phase 5) -->
+            <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest block mb-2">Readiness Trajectory Projections</span>
+                <div class="grid grid-cols-3 gap-2 text-center text-[10px]">
+                    <div class="bg-indigo-50/20 dark:bg-indigo-950/10 p-2 rounded-xl border border-indigo-100/10 shadow-sm">
+                        <span class="text-slate-400 block mb-0.5 font-bold uppercase text-[8px] tracking-wider">30 Days</span>
+                        <span class="font-extrabold text-slate-700 dark:text-slate-300">{{ predictions.projections.days_30 }}%</span>
+                    </div>
+                    <div class="bg-indigo-50/20 dark:bg-indigo-950/10 p-2 rounded-xl border border-indigo-100/10 shadow-sm">
+                        <span class="text-slate-400 block mb-0.5 font-bold uppercase text-[8px] tracking-wider">60 Days</span>
+                        <span class="font-extrabold text-slate-700 dark:text-slate-300">{{ predictions.projections.days_60 }}%</span>
+                    </div>
+                    <div class="bg-indigo-50/20 dark:bg-indigo-950/10 p-2 rounded-xl border border-indigo-100/10 shadow-sm">
+                        <span class="text-slate-400 block mb-0.5 font-bold uppercase text-[8px] tracking-wider">90 Days</span>
+                        <span class="font-extrabold text-indigo-650 dark:text-indigo-400">{{ predictions.projections.days_90 }}%</span>
+                    </div>
+                </div>
+                <div class="mt-2 text-[9px] text-slate-450 font-medium">
+                    Velocity index: +{{ predictions.velocity }}% readiness growth / day
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+            <span class="font-extrabold text-slate-700 dark:text-slate-300 block mb-1">Engine Analysis:</span>
+            {{ readiness.explanation }}
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Roadmap -->
+    <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-5">
+            <h3 class="font-bold text-base text-slate-850 dark:text-white flex items-center gap-2">
+                <i data-lucide="map" class="w-5 h-5 text-brand-500"></i>
+                Salary-Driven Career Roadmap
+            </h3>
+        </div>
+        <div class="relative pl-6 border-l-2 border-slate-200 dark:border-slate-800 space-y-6 text-xs">
+            {% for phase in roadmap.phases %}
+                <div class="relative">
+                    <span class="absolute -left-[30px] top-0.5 w-4.5 h-4.5 bg-brand-500 text-white rounded-full flex items-center justify-center font-bold text-[9px]">
+                        {{ loop.index }}
+                    </span>
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-extrabold text-slate-800 dark:text-white text-sm">{{ phase.title }}</h4>
+                        <span class="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-450 font-bold rounded">
+                            {{ phase.impact_range }}
+                        </span>
+                    </div>
+                    <p class="text-slate-500 dark:text-slate-400 mt-1">{{ phase.objective }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Market Trends -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+            <h3 class="font-bold text-base text-slate-850 dark:text-white flex items-center gap-2">
+                <i data-lucide="trending-up" class="w-5 h-5 text-rose-500"></i>
+                Market Skill Gaps Demands
+            </h3>
+        </div>
+        <div class="space-y-3.5 text-xs">
+            <div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Trending</span>
+                <div class="flex flex-wrap gap-1.5">
+                    {% for skill in trends.trending %}
+                        <span class="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-455 rounded font-bold border border-rose-100 dark:border-rose-900/15">
+                            {{ skill }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="pt-2">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Emerging High Paying</span>
+                <div class="flex flex-wrap gap-1.5">
+                    {% for skill in trends.emerging %}
+                        <span class="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 rounded font-bold border border-indigo-100 dark:border-indigo-900/15">
+                            {{ skill }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
